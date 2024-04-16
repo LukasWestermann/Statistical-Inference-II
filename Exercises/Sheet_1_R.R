@@ -2,16 +2,39 @@
 ############################################################################
 ##### Exercise 3 ###########################################################
 ############################################################################
-# d)
-cases_uk <- read.csv("Covid19_UK.csv")
+
+
+cases_uk = read.csv("Covid19_Uk.csv")
+head(cases_uk)
+summary(cases_uk)
 plot(cases_uk)
 
+# d)
 # construct the design matrix
-n <- nrow(cases_uk)
-X <- cbind(rep(1, n), 1:n)
+n = nrow(cases_uk)
+X = cbind(rep(1,n), 1:n)
 
-# ML-estimate
+# ML-estimate (same as OLS)
+y = log(cases_uk$total_cases)
+beta_ML  = solve(t(X) %*% X) %*% t(X)
+beta_ML
+
+#Via numerical optimisation:
+
+# Function to calculate l(beta)
+X = cbind(rep(1,n), 1:n)
 y <- log(cases_uk$total_cases)
+
+#log-likelihood to be optmised
+l_beta <- function(beta) {           # beta is a 1x2 vector of parameters
+  ll<-t(y-X%*%beta) %*% (y-X%*%beta) #proportional to actual log likelihood up to a constant
+  return(ll)
+}
+
+max_beta = optim(c(1,1),l_beta,method = "BFGS")
+max_beta
+
+#OLS version
 beta_ML <- solve(t(X) %*% X) %*% t(X) %*% y
 beta_ML
 
